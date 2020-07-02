@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         categoriAdd = findViewById(R.id.categoriAdd);
         add = findViewById(R.id.add);
         delete = findViewById(R.id.delete);
+        listView = findViewById(R.id.todoList);
 
         categoriAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -93,7 +94,6 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
 
 
-
                                 todo newTodo = new todo();
 
                                 newTodo.setTodoName(ed.getText().toString());
@@ -103,7 +103,8 @@ public class MainActivity extends AppCompatActivity {
                                 newTodo.setDate(datePicker.getDayOfMonth());
                                 newTodo.setCategori(categoris.get(spinner.getSelectedItemPosition()));
 
-                                todos.add(newTodo);
+                                todos.add(newTodo.);
+
                                 Toast.makeText(MainActivity.this, todos.get(todos.size() - 1).categori.categori, Toast.LENGTH_SHORT).show();
 
                             }
