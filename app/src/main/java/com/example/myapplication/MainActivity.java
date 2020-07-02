@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                                 newTodo.setDate(datePicker.getDayOfMonth());
                                 newTodo.setCategori(categoris.get(spinner.getSelectedItemPosition()));
 
-                                todos.add(newTodo.);
+                                todos.add(newTodo);
 
                                 Toast.makeText(MainActivity.this, todos.get(todos.size() - 1).categori.categori, Toast.LENGTH_SHORT).show();
 
