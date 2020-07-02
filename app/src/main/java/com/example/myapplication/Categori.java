@@ -1,18 +1,18 @@
 package com.example.myapplication;
 
 public class Categori {
-    String categori;
+    String categoriName;
     String color;
     int red;
     int green;
     int blue;
 
     public String getCategori() {
-        return categori;
+        return categoriName;
     }
 
     public void setCategori(String categori) {
-        this.categori = categori;
+        this.categoriName = categori;
     }
 
     public String getColor() {

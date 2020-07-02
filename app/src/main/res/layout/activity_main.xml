@@ -14,12 +14,6 @@
             android:layout_weight="1"
             android:text="추가"></Button>
         <Button
-            android:text="삭제"
-            android:id="@+id/delete"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"></Button>
-        <Button
             android:text="카테고리 추가"
             android:id="@+id/categoriAdd"
             android:layout_width="0dp"

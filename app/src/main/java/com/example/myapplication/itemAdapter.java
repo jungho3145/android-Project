@@ -52,9 +52,9 @@ public class itemAdapter extends BaseAdapter{
 
         categoriColor.setBackgroundColor(Color.rgb(itemTodo.categori.red, itemTodo.categori.green, itemTodo.categori.blue));
         todoItemName.setText(itemTodo.todoName);
-        todoItemContents.setText(itemTodo.todoContent);
-        todoItemCategori.setText(itemTodo.categori.categori);
-        todoItemDate.setText(itemTodo.year + " . " + itemTodo.month + " . " + itemTodo.date);
+        todoItemContents.setText("내용: " + itemTodo.todoContent);
+        todoItemCategori.setText("카테고리: " + itemTodo.categori.categoriName);
+        todoItemDate.setText("날짜: " + itemTodo.year + " . " + itemTodo.month + " . " + itemTodo.date);
 
 
         return convertView;
