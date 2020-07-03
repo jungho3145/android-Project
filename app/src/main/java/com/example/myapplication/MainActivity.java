@@ -4,10 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -19,24 +16,27 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
     ArrayList<Categori> categoris = new ArrayList<>();
     ArrayList<String> categorisSpinner = new ArrayList<>(); //스피너에서만 쓰일 어레이 리스트 //코드의 일관성을 위해 다른용도로 사용금지
-    ArrayList<todo> todos = new ArrayList<>();
+    ArrayList<Todo> Todos = new ArrayList<>();
 
     Button add, categoriAdd;
     ListView listView;
 
     String categoriSelected = "전체보기"; // 초기값은 항상 전체보기로 설
     int selectedItem = 0; // 전에 표시했던 카테고리가 어떤 카테고리 였는지 체크하기 위해 쓰는 변수 //코드의 일관성을 위해 다른용도로 사용금
+    int selectedDate = 0;
+
+    int[] day = new int[]{0,0,0};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +108,7 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if(array[i].equals("삭제")) {
-                                    todos.remove(position);
+                                    Todos.remove(position);
                                     makeListItem();
                                 }else{
 
@@ -149,8 +149,6 @@ public class MainActivity extends AppCompatActivity {
 
                 if(checkNull(categoris)) { //카테고리가 비어있으면 오류가 발생할수 있기 때문에
 
-
-
                     final String[] items = new String[categoris.size() + 1]; // 첫 아이템이 전체보기 이기 때문에 카테고리 수보다 1만큼 큰 배열 필요
 
                     items[0] = "전체보기"; // 첫 아이템은 전체보기로 설정
@@ -181,6 +179,58 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu2:
 
+                int j = 0;
+
+                String[] items = new String[Todos.size() + 1];
+
+                for(int i = 0; i < items.length; i++){
+                    items[i] = "null";
+                }
+
+                items[j] = "전체날짜";
+                j++;
+
+                for(int i = 0; i < Todos.size(); i++){
+                    if(!(Arrays.asList(items).contains(Todos.get(i).getYear() + "/" + Todos.get(i).getMonth() + "/" + Todos.get(i).getDate()))){
+                        items[j] = Todos.get(i).getYear() + "/" + Todos.get(i).getMonth() + "/" + Todos.get(i).getDate();
+                        j++;
+                    }else{
+                        continue;
+                    }
+                }
+
+                final String[] fItems = new String[j];
+
+                for(int i = 0; i < j; i++){
+                    fItems[i] = items[i];
+                }
+
+                AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
+                dlg.setTitle("날짜 선택")
+                        .setSingleChoiceItems(fItems, selectedDate, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                selectedDate = i;
+
+                                if(fItems[i].equals("전체날짜")){
+                                    day[0] = 0;
+                                    day[1] = 0;
+                                    day[2] = 0;
+                                }else {
+                                    String array[] = fItems[i].split("/");
+                                    day[0] = Integer.parseInt(array[0]);
+                                    day[1] = Integer.parseInt(array[1]);
+                                    day[2] = Integer.parseInt(array[2]);
+                                }
+
+                                Toast.makeText(MainActivity.this,  fItems[i] + " 날짜에 해당하는 항목만 보여드립니다.", Toast.LENGTH_SHORT).show();
+
+                                makeListItem();
+
+                                dialogInterface.dismiss();
+                            }
+                        }).show();
+
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -201,16 +251,28 @@ public class MainActivity extends AppCompatActivity {
     public void makeListItem(){ // 리스트 어댑터를 만들어 리스트에 연결해주는 변수 부를때마다 리스트 어댑터를 만들어 어댑터에 보내주기 때문에
                                 // notify가 필요하지 않음
 
-        ArrayList<todo> insert = new ArrayList<>(); // 필터링된 항목을 담는 배열
+        ArrayList<Todo> insert = new ArrayList<>(); // 필터링된 항목을 담는 배열
 
-        if(categoriSelected.equals("") || categoriSelected.equals("전체보기")){ // 카테고리와 날짜를 설정했을때 해당하지 않는 항목들 필터링
-            for(int i = 0; i< todos.size(); i++){
-                insert.add(todos.get(i));
+        if(categoriSelected.equals("전체보기") && (day[0] == 0 && day[1] == 0 && day[2] == 0)){ // 카테고리와 날짜를 설정했을때 해당하지 않는 항목들 필터링
+            for(int i = 0; i< Todos.size(); i++){
+                insert.add(Todos.get(i));
+            }
+        }else if(!categoriSelected.equals("전체보기") && (day[0] == 0 && day[1] == 0 && day[2] == 0)){
+            for (int i = 0; i < Todos.size(); i++) {
+                if(categoriSelected.equals(Todos.get(i).categori.categoriName)){
+                    insert.add(Todos.get(i));
+                }
+            }
+        }else if(categoriSelected.equals("전체보기") && !(day[0] == 0 && day[1] == 0 && day[2] == 0)){
+            for (int i = 0; i < Todos.size(); i++){
+                if(day[0] == Todos.get(i).getYear() && day[1] == Todos.get(i).getMonth() && day[2] == Todos.get(i).getDate()){
+                    insert.add(Todos.get(i));
+                }
             }
         }else {
-            for (int i = 0; i < todos.size(); i++) {
-                if(categoriSelected.equals(todos.get(i).categori.categoriName)){
-                    insert.add(todos.get(i));
+            for (int i = 0; i < Todos.size(); i++){
+                if(day[0] == Todos.get(i).getYear() && day[1] == Todos.get(i).getMonth() && day[2] == Todos.get(i).getDate() && categoriSelected.equals(Todos.get(i).categori.categoriName)){
+                    insert.add(Todos.get(i));
                 }
             }
         }
@@ -234,8 +296,8 @@ public class MainActivity extends AppCompatActivity {
         final DatePicker datePicker = dialogView.findViewById(R.id.datePicker);
 
         if(id == 2){
-            ed.setText(todos.get(position).todoName);
-            ed2.setText(todos.get(position).todoContent);
+            ed.setText(Todos.get(position).todoName);
+            ed2.setText(Todos.get(position).todoContent);
         }
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, categorisSpinner); // 아답터 생
@@ -247,30 +309,18 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-
-
-
-                        todo newTodo = new todo();
-
-                        newTodo.setTodoName(ed.getText().toString());
-                        newTodo.setTodoContent(ed2.getText().toString());
-                        newTodo.setYear(datePicker.getYear());
-                        newTodo.setMonth(datePicker.getMonth());
-                        newTodo.setDate(datePicker.getDayOfMonth());
-                        newTodo.setCategori(categoris.get(spinner.getSelectedItemPosition()));
-
-
+                        Todo newTodo = new Todo(ed.getText().toString(), ed2.getText().toString(),categoris.get(spinner.getSelectedItemPosition()) , datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
 
                         if(id == 2){
-                            todos.add(position, newTodo);
-                            todos.remove(position + 1);
+                            Todos.add(position, newTodo);
+                            Todos.remove(position + 1);
                         }
                         else{
-                            todos.add(newTodo);
+                            Todos.add(newTodo);
                         }
 
                         makeListItem(); // 리스트 항목에 띄워주기
-                        Toast.makeText(MainActivity.this, todos.get(todos.size() - 1).categori.categoriName, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, Todos.get(Todos.size() - 1).categori.categoriName, Toast.LENGTH_SHORT).show();
 
                     }
                 })

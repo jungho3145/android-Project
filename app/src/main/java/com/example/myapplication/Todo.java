@@ -2,13 +2,25 @@ package com.example.myapplication;
 
 import java.util.Date;
 
-public class todo {
+public class Todo {
     String todoName;
     String todoContent;
     Categori categori;
     int date;
     int year;
     int month;
+
+    public Todo(){
+    }
+
+    public Todo(String todoName, String todoContent, Categori categori, int year, int month, int date){
+        this.todoName = todoName;
+        this.todoContent = todoContent;
+        this.categori = categori;
+        this.date = date;
+        this.year = year;
+        this.month = month;
+    }
 
     public String getTodoName() {
         return todoName;

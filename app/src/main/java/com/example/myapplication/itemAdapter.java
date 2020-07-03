@@ -9,22 +9,20 @@ import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 
 public class itemAdapter extends BaseAdapter{
 
-    ArrayList<todo> todos = new ArrayList<>();
+    ArrayList<Todo> Todos = new ArrayList<>();
 
     @Override
     public int getCount() {
-        return todos.size();
+        return Todos.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return todos.get(position);
+        return Todos.get(position);
     }
 
     @Override
@@ -48,7 +46,7 @@ public class itemAdapter extends BaseAdapter{
         TextView todoItemCategori = convertView.findViewById(R.id.todoItemCategori);
         TextView todoItemDate = convertView.findViewById(R.id.todoItemDate);
 
-        todo itemTodo = todos.get(position);
+        Todo itemTodo = Todos.get(position);
 
         categoriColor.setBackgroundColor(Color.rgb(itemTodo.categori.red, itemTodo.categori.green, itemTodo.categori.blue));
         todoItemName.setText(itemTodo.todoName);
@@ -61,6 +59,6 @@ public class itemAdapter extends BaseAdapter{
     }
 
     public void addItem(ArrayList items){
-        this.todos = items;
+        this.Todos = items;
     }
 }
