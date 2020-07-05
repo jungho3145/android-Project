@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -25,9 +27,9 @@ import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
 
-    ArrayList<Categori> categoris = new ArrayList<>();
+    MyDatabaseOpenHelper db;
+
     ArrayList<String> categorisSpinner = new ArrayList<>(); //스피너에서만 쓰일 어레이 리스트 //코드의 일관성을 위해 다른용도로 사용금지
-    ArrayList<Todo> Todos = new ArrayList<>();
 
     Button add, categoriAdd;
     ListView listView;
@@ -36,16 +38,24 @@ public class MainActivity extends AppCompatActivity {
     int selectedItem = 0; // 전에 표시했던 카테고리가 어떤 카테고리 였는지 체크하기 위해 쓰는 변수 //코드의 일관성을 위해 다른용도로 사용금
     int selectedDate = 0;
 
-    int[] day = new int[]{0,0,0};
+    String date = "전체날짜";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        db = new MyDatabaseOpenHelper(MainActivity.this);
+
         categoriAdd = findViewById(R.id.categoriAdd); // 위젯 연결
         add = findViewById(R.id.add);
         listView = findViewById(R.id.todoList);
+
+        categorisSpinner = CategoriesSpinnerUpdate();
+        makeListItem();
+
+
 
         categoriAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,20 +73,15 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        Categori newCategori = new Categori();// 새로운 카테고리 생성
-                        newCategori.setCategori(ed.getText().toString());
-                        newCategori.setColor(ed2.getText().toString());
+                        Category newCategory = new Category();// 새로운 카테고리 생성
+                        newCategory.setCategori(ed.getText().toString());
+                        newCategory.setColor(ed2.getText().toString());
 
-                        categoris.add(newCategori); // 카테고리 목록에 추가
-                        categorisSpinner.add(categoris.get(categoris.size() - 1).categoriName); // 스피너를 위한 카테고리 이름 목록에 추가
+                        if(db.insertCategories(db.CATEGORIES_ID, newCategory.categoriName, newCategory.color)){
+                            Toast.makeText(MainActivity.this, db.getCategoriesResult(), Toast.LENGTH_SHORT).show();
+                        }
 
-                        Toast.makeText(MainActivity.this, categoris.get(categoris.size() - 1).categoriName +
-                                "가 추가되었습니다 색상 코드: " +
-                                categoris.get(categoris.size() - 1).red +
-                                ", " + categoris.get(categoris.size() - 1).green +
-                                ", " + categoris.get(categoris.size() - 1).blue,
-                                Toast.LENGTH_SHORT).show();
-
+                        categorisSpinner = CategoriesSpinnerUpdate();
                    }
                 })
                         .setNegativeButton("취소", null)
@@ -89,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
         add.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(checkNull(categoris)) { // 카테고리가 비어있으면 오류가 발생할수 있기 때문에
+                if(checkNull()) { // 카테고리가 비어있으면 오류가 발생할수 있기 때문에
 
                     dialogMakerAddOrEdit(1, 0);
                 }
@@ -108,11 +113,11 @@ public class MainActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 if(array[i].equals("삭제")) {
-                                    Todos.remove(position);
+                                    db.deleteTodos(position + 1);
                                     makeListItem();
                                 }else{
 
-                                    if(checkNull(categoris)) { // 카테고리가 비어있으면 오류가 발생할수 있기 때문에
+                                    if(checkNull()) { // 카테고리가 비어있으면 오류가 발생할수 있기 때문에
 
                                         dialogMakerAddOrEdit(2, position);
                                     }
@@ -147,15 +152,15 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.menu1:
 
-                if(checkNull(categoris)) { //카테고리가 비어있으면 오류가 발생할수 있기 때문에
+                if(checkNull()) {
 
-                    final String[] items = new String[categoris.size() + 1]; // 첫 아이템이 전체보기 이기 때문에 카테고리 수보다 1만큼 큰 배열 필요
+                    final String[] items = new String[categorisSpinner.size() + 1];
+                    items[0] = "전체보기";
 
-                    items[0] = "전체보기"; // 첫 아이템은 전체보기로 설정
-
-                    for (int i = 0; i < categoris.size(); i++) {
-                        items[i + 1] = categoris.get(i).categoriName; // 카테고리들이 전체보기 다음에 들어가야 하므로 i + 1
+                    for(int i = 1; i <= categorisSpinner.size(); i++){
+                        items[i] = categorisSpinner.get(i - 1);
                     }
+
 
                     AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
                     dlg.setTitle("카테고리 선택") //카테고리 선택하기
@@ -168,7 +173,7 @@ public class MainActivity extends AppCompatActivity {
 
                                     Toast.makeText(MainActivity.this, items[i] + " 카테고리 항목만 보여드립니다.", Toast.LENGTH_SHORT).show();
 
-                                    makeListItem(); // 리스트 항목에 띄워주기
+                                    //makeListItem(); // 리스트 항목에 띄워주기
 
                                     dialogInterface.dismiss(); // 라디오버튼 클릭시 바로 다이얼로그 종료
                                 }
@@ -179,31 +184,26 @@ public class MainActivity extends AppCompatActivity {
                 break;
             case R.id.menu2:
 
-                int j = 0;
+                ArrayList<String> items = new ArrayList<>();
 
-                String[] items = new String[Todos.size() + 1];
+                String[] dateAll = db.getTOdosResultDate().split("\n");
 
-                for(int i = 0; i < items.length; i++){
-                    items[i] = "null";
-                }
+                items.add("전체날짜");
 
-                items[j] = "전체날짜";
-                j++;
-
-                for(int i = 0; i < Todos.size(); i++){
-                    if(!(Arrays.asList(items).contains(Todos.get(i).getYear() + "/" + Todos.get(i).getMonth() + "/" + Todos.get(i).getDate()))){
-                        items[j] = Todos.get(i).getYear() + "/" + Todos.get(i).getMonth() + "/" + Todos.get(i).getDate();
-                        j++;
-                    }else{
-                        continue;
+                for(String date : dateAll){
+                    if(!items.contains(date)){
+                        items.add(date);
                     }
                 }
 
-                final String[] fItems = new String[j];
+                final String[] fItems = new String[items.size()];
 
-                for(int i = 0; i < j; i++){
-                    fItems[i] = items[i];
+                for(int i = 0; i < items.size(); i++){
+                    fItems[i] = items.get(i);
                 }
+
+
+
 
                 AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this);
                 dlg.setTitle("날짜 선택")
@@ -212,20 +212,11 @@ public class MainActivity extends AppCompatActivity {
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 selectedDate = i;
 
-                                if(fItems[i].equals("전체날짜")){
-                                    day[0] = 0;
-                                    day[1] = 0;
-                                    day[2] = 0;
-                                }else {
-                                    String array[] = fItems[i].split("/");
-                                    day[0] = Integer.parseInt(array[0]);
-                                    day[1] = Integer.parseInt(array[1]);
-                                    day[2] = Integer.parseInt(array[2]);
-                                }
+                                date = fItems[i];
 
                                 Toast.makeText(MainActivity.this,  fItems[i] + " 날짜에 해당하는 항목만 보여드립니다.", Toast.LENGTH_SHORT).show();
 
-                                makeListItem();
+                                //makeListItem();
 
                                 dialogInterface.dismiss();
                             }
@@ -236,8 +227,8 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public boolean checkNull(ArrayList items){ //비어있는지 확인하는 변수
-        if(items.size() == 0){
+    public boolean checkNull(){ //비어있는지 확인하는 변수
+        if(db.getCategoriesResult().equals("")){
             Toast.makeText(this, "카테고리가 없습니다. 카테고리를 먼저 생성해주세요", Toast.LENGTH_SHORT).show();
             return false;
         }
@@ -251,40 +242,37 @@ public class MainActivity extends AppCompatActivity {
     public void makeListItem(){ // 리스트 어댑터를 만들어 리스트에 연결해주는 변수 부를때마다 리스트 어댑터를 만들어 어댑터에 보내주기 때문에
                                 // notify가 필요하지 않음
 
-        ArrayList<Todo> insert = new ArrayList<>(); // 필터링된 항목을 담는 배열
+        String[] insertBefore = db.getTodosResultAll().split("\n");
 
-        if(categoriSelected.equals("전체보기") && (day[0] == 0 && day[1] == 0 && day[2] == 0)){ // 카테고리와 날짜를 설정했을때 해당하지 않는 항목들 필터링
-            for(int i = 0; i< Todos.size(); i++){
-                insert.add(Todos.get(i));
+        if(!insertBefore[0].equals("")) {
+            ArrayList<AdapterItemData> insert = new ArrayList<>();
+
+            for (String s : insertBefore) {
+                String[] s1 = s.split(":");
+                AdapterItemData newData = new AdapterItemData();
+
+                newData.setTodoName(s1[1]);
+                newData.setTodoContent(s1[2]);
+                newData.setCategoriName(this.getCategories(Integer.parseInt(s1[3])).getCategori());
+                newData.setColor(this.getCategories(Integer.parseInt(s1[3])).getColor());
+                newData.setDate(s1[4]);
+
+                insert.add(newData);
             }
-        }else if(!categoriSelected.equals("전체보기") && (day[0] == 0 && day[1] == 0 && day[2] == 0)){
-            for (int i = 0; i < Todos.size(); i++) {
-                if(categoriSelected.equals(Todos.get(i).categori.categoriName)){
-                    insert.add(Todos.get(i));
-                }
-            }
-        }else if(categoriSelected.equals("전체보기") && !(day[0] == 0 && day[1] == 0 && day[2] == 0)){
-            for (int i = 0; i < Todos.size(); i++){
-                if(day[0] == Todos.get(i).getYear() && day[1] == Todos.get(i).getMonth() && day[2] == Todos.get(i).getDate()){
-                    insert.add(Todos.get(i));
-                }
-            }
-        }else {
-            for (int i = 0; i < Todos.size(); i++){
-                if(day[0] == Todos.get(i).getYear() && day[1] == Todos.get(i).getMonth() && day[2] == Todos.get(i).getDate() && categoriSelected.equals(Todos.get(i).categori.categoriName)){
-                    insert.add(Todos.get(i));
-                }
-            }
+
+            itemAdapter adapter = new itemAdapter();
+            adapter.addItem(insert);
+            listView.setAdapter(adapter);
         }
-        itemAdapter adapter = new itemAdapter();
-        adapter.addItem(insert); // 필터링된 항목 보내주기
-        listView.setAdapter(adapter);
+
     }
 
 
 
 
     public void dialogMakerAddOrEdit(final int id, final int position){
+
+        String[] datas = db.getTodosResultById(position + 1).split(":");
 
         final AlertDialog.Builder dlg = new AlertDialog.Builder(MainActivity.this); // 다이얼로그 생성
         LayoutInflater inflater = getLayoutInflater();
@@ -296,8 +284,8 @@ public class MainActivity extends AppCompatActivity {
         final DatePicker datePicker = dialogView.findViewById(R.id.datePicker);
 
         if(id == 2){
-            ed.setText(Todos.get(position).todoName);
-            ed2.setText(Todos.get(position).todoContent);
+            ed.setText(datas[1]);
+            ed2.setText(datas[2]);
         }
 
         ArrayAdapter<String> arrayAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_spinner_dropdown_item, categorisSpinner); // 아답터 생
@@ -309,23 +297,51 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        Todo newTodo = new Todo(ed.getText().toString(), ed2.getText().toString(),categoris.get(spinner.getSelectedItemPosition()) , datePicker.getYear(), datePicker.getMonth(), datePicker.getDayOfMonth());
+                        String date = datePicker.getYear() + "/" + (datePicker.getMonth() + 1) + "/" + datePicker.getDayOfMonth();
+
+                        Todo newTodo = new Todo(ed.getText().toString(), ed2.getText().toString(), (spinner.getSelectedItemPosition() + 1), date);
 
                         if(id == 2){
-                            Todos.add(position, newTodo);
-                            Todos.remove(position + 1);
+                            db.updateTodosData(String.valueOf(position + 1), newTodo.getTodoName(), newTodo.getTodoContent(), String.valueOf(newTodo.getCategoryid()), newTodo.getDate());
                         }
                         else{
-                            Todos.add(newTodo);
+                            db.insertTodos(db.TODOS_ID, newTodo.getTodoName(), newTodo.getTodoContent(), String.valueOf(newTodo.getCategoryid()), newTodo.getDate());
                         }
 
                         makeListItem(); // 리스트 항목에 띄워주기
-                        Toast.makeText(MainActivity.this, Todos.get(Todos.size() - 1).categori.categoriName, Toast.LENGTH_SHORT).show();
 
                     }
                 })
                 .setNegativeButton("취소", null)
                 .show();
+    }
+
+    public ArrayList CategoriesSpinnerUpdate(){
+        String result = db.getCategoriesResult();
+        ArrayList<String> newCategoriesSpinner = new ArrayList<>();
+        if(!result.equals("")) {
+            String[] sli = result.split("\n");
+
+            for (String s : sli) {
+                String[] strings = s.split(":");
+                newCategoriesSpinner.add(strings[1]);
+            }
+        }
+
+        return newCategoriesSpinner;
+    }
+
+    public Category getCategories(int id) {
+        String[] categoriString = db.getCategoriesResultById(id).split(":");
+        Category newcategory = new Category();
+        if(!categoriString[0].equals("")) {
+            newcategory.setCategori(categoriString[1]);
+            newcategory.setColor(categoriString[2]);
+        }else{
+            newcategory.setCategori("ERRER");
+            newcategory.setColor("000000");
+        }
+        return newcategory;
     }
 
 }

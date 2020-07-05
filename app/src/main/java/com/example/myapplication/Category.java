@@ -1,11 +1,13 @@
 package com.example.myapplication;
 
-public class Categori {
+public class Category {
     String categoriName;
     String color;
-    int red;
-    int green;
-    int blue;
+
+
+    public Category() {
+
+    }
 
     public String getCategori() {
         return categoriName;
@@ -21,8 +23,5 @@ public class Categori {
 
     public void setColor(String color) {
         this.color = color;
-        red = Integer.parseInt(this.color.substring(0,2), 16);
-        green = Integer.parseInt(this.color.substring(2,4), 16);
-        blue = Integer.parseInt(this.color.substring(4,6), 16);
     }
 }

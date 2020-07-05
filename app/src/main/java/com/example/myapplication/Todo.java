@@ -1,25 +1,20 @@
 package com.example.myapplication;
 
-import java.util.Date;
-
 public class Todo {
     String todoName;
     String todoContent;
-    Categori categori;
-    int date;
-    int year;
-    int month;
+    int categoryid;
+    String date;
 
     public Todo(){
     }
 
-    public Todo(String todoName, String todoContent, Categori categori, int year, int month, int date){
+    public Todo(String todoName, String todoContent, int categoryid, String date){
         this.todoName = todoName;
         this.todoContent = todoContent;
-        this.categori = categori;
+        this.categoryid = categoryid;
         this.date = date;
-        this.year = year;
-        this.month = month;
+
     }
 
     public String getTodoName() {
@@ -38,35 +33,19 @@ public class Todo {
         this.todoContent = todoContent;
     }
 
-    public Categori getCategori() {
-        return categori;
+    public int getCategoryid() {
+        return categoryid;
     }
 
-    public void setCategori(Categori categori) {
-        this.categori = categori;
+    public void setCategoryid(int categoryid) {
+        this.categoryid = categoryid;
     }
 
-    public int getDate() {
+    public String getDate() {
         return date;
     }
 
-    public void setDate(int date) {
+    public void setDate(String date) {
         this.date = date;
-    }
-
-    public int getYear() {
-        return year;
-    }
-
-    public void setYear(int year) {
-        this.year = year;
-    }
-
-    public int getMonth() {
-        return month;
-    }
-
-    public void setMonth(int month) {
-        this.month = month;
     }
 }

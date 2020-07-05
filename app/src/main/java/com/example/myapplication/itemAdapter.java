@@ -13,16 +13,16 @@ import java.util.ArrayList;
 
 public class itemAdapter extends BaseAdapter{
 
-    ArrayList<Todo> Todos = new ArrayList<>();
+    ArrayList<AdapterItemData> data = new ArrayList<>();
 
     @Override
     public int getCount() {
-        return Todos.size();
+        return data.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return Todos.get(position);
+        return data.get(position);
     }
 
     @Override
@@ -46,19 +46,19 @@ public class itemAdapter extends BaseAdapter{
         TextView todoItemCategori = convertView.findViewById(R.id.todoItemCategori);
         TextView todoItemDate = convertView.findViewById(R.id.todoItemDate);
 
-        Todo itemTodo = Todos.get(position);
+        AdapterItemData data = this.data.get(position);
 
-        categoriColor.setBackgroundColor(Color.rgb(itemTodo.categori.red, itemTodo.categori.green, itemTodo.categori.blue));
-        todoItemName.setText(itemTodo.todoName);
-        todoItemContents.setText("내용: " + itemTodo.todoContent);
-        todoItemCategori.setText("카테고리: " + itemTodo.categori.categoriName);
-        todoItemDate.setText("날짜: " + itemTodo.year + " . " + itemTodo.month + " . " + itemTodo.date);
+        categoriColor.setBackgroundColor(Color.rgb(data.red, data.green, data.blue));
+        todoItemName.setText(data.getTodoName());
+        todoItemContents.setText("내용: " + data.getTodoContent());
+        todoItemCategori.setText("카테고리: " + data.getCategoriName());
+        todoItemDate.setText("날짜: " + data.getDate());
 
 
         return convertView;
     }
 
     public void addItem(ArrayList items){
-        this.Todos = items;
+       this.data = items;
     }
 }
