@@ -5,6 +5,7 @@ public class Todo {
     String todoContent;
     int categoryid;
     String date;
+    boolean status;
 
     public Todo(){
     }

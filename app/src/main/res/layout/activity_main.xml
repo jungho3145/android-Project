@@ -20,6 +20,12 @@
             android:layout_height="match_parent"
             android:layout_weight="1"></Button>
     </LinearLayout>
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="?android:attr/progressBarStyleHorizontal"></ProgressBar>
+
 
     <ListView
         android:id="@+id/todoList"

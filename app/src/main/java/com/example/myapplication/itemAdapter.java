@@ -3,15 +3,17 @@ package com.example.myapplication;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-public class itemAdapter extends BaseAdapter{
+public class itemAdapter extends BaseAdapter {
 
     ArrayList<AdapterItemData> data = new ArrayList<>();
 
@@ -31,7 +33,7 @@ public class itemAdapter extends BaseAdapter{
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
 
         Context context = parent.getContext();
 
@@ -40,25 +42,29 @@ public class itemAdapter extends BaseAdapter{
             convertView = inflater.inflate(R.layout.todo_item, parent, false);
         }
 
+        LinearLayout back = convertView.findViewById(R.id.back);
         LinearLayout categoriColor = convertView.findViewById(R.id.categoriColor);
         TextView todoItemName = convertView.findViewById(R.id.todoItemName);
         TextView todoItemContents = convertView.findViewById(R.id.todoItemContents);
         TextView todoItemCategori = convertView.findViewById(R.id.todoItemCategori);
         TextView todoItemDate = convertView.findViewById(R.id.todoItemDate);
 
-        AdapterItemData data = this.data.get(position);
+        final AdapterItemData data = this.data.get(position);
 
         categoriColor.setBackgroundColor(Color.rgb(data.red, data.green, data.blue));
         todoItemName.setText(data.getTodoName());
         todoItemContents.setText("내용: " + data.getTodoContent());
         todoItemCategori.setText("카테고리: " + data.getCategoriName());
         todoItemDate.setText("날짜: " + data.getDate());
-
+        if (data.isStatus()) {
+            back.setBackgroundColor(Color.rgb(0, 102, 0));
+        }
 
         return convertView;
     }
 
-    public void addItem(ArrayList items){
-       this.data = items;
+    public void addItem(ArrayList items) {
+        this.data = items;
     }
+
 }

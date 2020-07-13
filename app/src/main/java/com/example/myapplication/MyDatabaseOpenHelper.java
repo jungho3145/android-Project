@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.util.ArrayList;
+
 import androidx.annotation.Nullable;
 
 public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
@@ -27,7 +29,7 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        String sql_make_todos_table = "CREATE TABLE " + TODOS_TABLE_NAME + "(id INTEGER PRIMARY KEY, todoname TEXT, todocontent TEXT, categoriesid INTEGER, date TEXT);";
+        String sql_make_todos_table = "CREATE TABLE " + TODOS_TABLE_NAME + "(id INTEGER PRIMARY KEY, todoname TEXT, todocontent TEXT, categoriesid INTEGER, date TEXT, status INTEGER);";
         String sql_make_categories_table = "CREATE TABLE " + CATEGORIES_TABLE_NAEM + "(categoriesid INTEGER PRIMARY KEY, categoryname TEXT, colorcode TEXT);";
 
         sqLiteDatabase.execSQL(sql_make_todos_table);
@@ -79,7 +81,13 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public boolean insertTodos(int Key, String name, String content, String categoriesid, String date){
+    public boolean insertTodos(int Key, String name, String content, String categoriesid, String date, boolean status){
+        int sta = 0;
+
+        if(status){
+            sta = 1;
+        }
+
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("id", Key);
@@ -87,6 +95,7 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
         contentValues.put("todocontent", content);
         contentValues.put("categoriesid", categoriesid);
         contentValues.put("date", date);
+        contentValues.put("status", sta);
         long result = db.insert(TODOS_TABLE_NAME, null, contentValues);
         TODOS_ID++;
         if(result == -1){
@@ -106,7 +115,8 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
                     + cursor.getString(1) + ":"
                     + cursor.getString(2) + ":"
                     + cursor.getString(3) + ":"
-                    + cursor.getString(4) + "\n";
+                    + cursor.getString(4) + ":"
+                    + cursor.getString(5) + "\n";
         }
 
         return result;
@@ -133,11 +143,13 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
                     + cursor.getString(1) + ":"
                     + cursor.getString(2) + ":"
                     + cursor.getString(3) + ":"
-                    + cursor.getString(4);
+                    + cursor.getString(4) + ":"
+                    + cursor.getString(5);
         }
 
         return result;
     }
+
 
     public String getCategoriesResultById(int id){
         SQLiteDatabase db = getReadableDatabase();
@@ -152,7 +164,22 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
         return result;
     }
 
-    public void updateTodosData(String id, String name, String content, String categoriesid, String date){
+    public ArrayList getTodosId(String name){
+        SQLiteDatabase db = getReadableDatabase();
+        ArrayList<Integer> result = new ArrayList<>();
+        Cursor cursor = db.rawQuery("SELECT id FROM todos WHERE todoname = " + name, null);
+        while (cursor.moveToNext()){
+            result.add(Integer.parseInt(cursor.getString(0)));
+        }
+
+        return result;
+    }
+
+    public void updateTodosData(String id, String name, String content, String categoriesid, String date, boolean status){
+        int sta = 0;
+        if (status){
+            sta = 1;
+        }
         SQLiteDatabase db = getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put("id", id);
@@ -160,7 +187,18 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
         contentValues.put("todocontent", content);
         contentValues.put("categoriesid", categoriesid);
         contentValues.put("date", date);
+        contentValues.put("status", sta);
         db.update(TODOS_TABLE_NAME, contentValues, "ID = ?", new String[] {id});
+    }
+
+    public void updateTodosStatus(String id, boolean status){
+        int sta = 0;
+        if(status){
+            sta = 1;
+        }
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("update todos set status = " + sta + " WHERE id = " + id);
     }
 
     public void deleteTodos(int id){
@@ -181,8 +219,13 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
         int i = 1;
         int j = 1;
         for(String s: todos ){
+            boolean status = false;
+
             String[] strings = s.split(":");
-            this.insertTodos(i, strings[1], strings[2], strings[3], strings[4]);
+            if(strings[5].equals("1")){
+                status = true;
+            }
+            this.insertTodos(i, strings[1], strings[2], strings[3], strings[4], status);
             i++;
         }
         for(String s: categories){
@@ -196,12 +239,7 @@ public class MyDatabaseOpenHelper extends SQLiteOpenHelper {
 
     }
 
-    public boolean CheckingRightColor(String s){
-        if(s.length() == 6){
-            return false;
-        }
-        return true;
-    }
+
 
 
 

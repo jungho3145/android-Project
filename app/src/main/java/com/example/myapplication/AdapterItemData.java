@@ -6,6 +6,25 @@ public class AdapterItemData {
     String todoName;
     String todoContent;
     String date;
+    boolean status;
+    int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public boolean isStatus() {
+        return status;
+    }
+
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
     int red;
     int blue;
     int green;
