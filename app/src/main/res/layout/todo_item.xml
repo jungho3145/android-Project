@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:id="@+id/back">
+    <LinearLayout
+        android:id="@+id/categoriColor"
+        android:layout_width="10dp"
+        android:layout_height="match_parent"
+        android:background="#123456"
+        android:orientation="horizontal"></LinearLayout>
+
+    <TextView
+        android:id="@+id/todoItemName"
+        android:layout_width="200dp"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:text="123"
+        android:textSize="30dp"></TextView>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/todoItemContents"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </TextView>
+        <TextView
+            android:id="@+id/todoItemCategori"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </TextView>
+        <TextView
+            android:id="@+id/todoItemDate"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+        </TextView>
+    </LinearLayout>
+
+</LinearLayout>
