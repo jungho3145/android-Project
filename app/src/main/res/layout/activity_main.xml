@@ -8,30 +8,33 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <Button
+            android:layout_margin="6dp"
+            android:background="@drawable/main_edit_button"
             android:id="@+id/add"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:text="추가"></Button>
         <Button
+            android:layout_margin="6dp"
+            android:background="@drawable/main_edit_button"
             android:text="카테고리 추가"
             android:id="@+id/categoriAdd"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"></Button>
     </LinearLayout>
+
     <ProgressBar
         android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyleHorizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        style="?android:attr/progressBarStyleHorizontal"></ProgressBar>
-
+        android:layout_height="42dp"></ProgressBar>
 
     <ListView
         android:id="@+id/todoList"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </ListView>
+        android:layout_height="match_parent"></ListView>
 
 
 </LinearLayout>

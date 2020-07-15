@@ -44,8 +44,8 @@ public class AdapterItemData {
     public void setColor(String color) {
         this.color = color;
         this.red = Integer.parseInt(color.substring(0,2), 16);
-        this.blue = Integer.parseInt(color.substring(2,4), 16);
-        this.green = Integer.parseInt(color.substring(4,6), 16);
+        this.green = Integer.parseInt(color.substring(2,4), 16);
+        this.blue = Integer.parseInt(color.substring(4,6), 16);
     }
 
     public String getTodoName() {

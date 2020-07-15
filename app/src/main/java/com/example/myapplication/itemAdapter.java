@@ -57,7 +57,7 @@ public class itemAdapter extends BaseAdapter {
         todoItemCategori.setText("카테고리: " + data.getCategoriName());
         todoItemDate.setText("날짜: " + data.getDate());
         if (data.isStatus()) {
-            back.setBackgroundColor(Color.rgb(0, 102, 0));
+            back.setBackgroundResource(R.drawable.todo_item_checked);
         }
 
         return convertView;

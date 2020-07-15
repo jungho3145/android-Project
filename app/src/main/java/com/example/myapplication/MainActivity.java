@@ -24,12 +24,16 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import com.jaredrummler.android.colorpicker.ColorPickerDialog;
+import com.jaredrummler.android.colorpicker.ColorPickerDialogListener;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ColorPickerDialogListener{
 
     static MyDatabaseOpenHelper db;
+    final Category added = new Category();
 
     ArrayList<String> categorisSpinner = new ArrayList<>(); //스피너에서만 쓰일 어레이 리스트 //코드의 일관성을 위해 다른용도로 사용금지
     ArrayList<AdapterItemData> insert;
@@ -83,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
 
                 final View dialogView = inflater.inflate(R.layout.dialog_categori_add, null); //인플레이터로 다이얼로그에 띄울 VIEW객체 생성
                 final EditText ed = dialogView.findViewById(R.id.dlgNameEd); // 위 객체 안에 있는 위젯 객체들 연결
-                final EditText ed2 = dialogView.findViewById(R.id.dlgColorEd);
 
                 dlg.setTitle("카테고리 추가") // 다이얼로그 설정
                     .setView(dialogView)
@@ -91,14 +94,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
 
-                        Category newCategory = new Category();// 새로운 카테고리 생성
-                        newCategory.setCategori(ed.getText().toString());
-                        newCategory.setColor(ed2.getText().toString());
-
-
-                            db.insertCategories(db.CATEGORIES_ID, newCategory.categoriName, newCategory.color);
-                            categorisSpinner = CategoriesSpinnerUpdate();
-
+                        // 새로운 카테고리 생성
+                        added.setCategori(ed.getText().toString());
+                        ColorPickerDialog.newBuilder().setDialogType(ColorPickerDialog.TYPE_PRESETS).show(MainActivity.this);
 
 
                    }
@@ -428,4 +426,19 @@ public class MainActivity extends AppCompatActivity {
         return newData;
     }
 
+    @Override
+    public void onColorSelected(int dialogId, int color) {
+
+        added.setColor(Integer.toHexString(color).substring(2,8));
+
+        db.insertCategories(db.CATEGORIES_ID, added.categoriName, added.color);
+        categorisSpinner = CategoriesSpinnerUpdate();
+    }
+
+    @Override
+    public void onDialogDismissed(int dialogId) {
+
+
+
+    }
 }
